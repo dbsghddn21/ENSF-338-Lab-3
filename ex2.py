@@ -19,11 +19,19 @@ def quicksort(arr):
 
 def interpolateAndPlot(listsize, times, popt, pcov, func, title):
     x = np.linspace(min(listsize), max(listsize), num=100, endpoint=True)
-    plt.plot(listsize, times, xnew, func(xnew, *popt), '-')
+    plt.plot(listsize, times, x, func(x, *popt), '-')
     plt.title(title)
     plt.savefig(title + '.png')
     plt.show()
 
+def sortRegardListSize(arr):
+    if len(arr) <= 1:
+        return arr
+    if len(arr) <2000:
+        return bubblesort(arr)
+    else:
+        return quicksort(arr)
+    
     
     
 
