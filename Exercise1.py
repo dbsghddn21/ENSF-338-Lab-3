@@ -1,3 +1,7 @@
+
+import sys 
+sys.setrecursionlimit(20000)
+
 def merge_sort(arr, low, high):
     if low < high:
         mid = (low + high)//2
