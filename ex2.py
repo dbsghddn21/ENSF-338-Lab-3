@@ -2,13 +2,24 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 import timeit
+import random
+import copy
+
+import sys
+sys.setrecursionlimit(16000)
+
 def bubblesort(arr):
     n = len(arr)
     for i in range(n):
+        swapped = False
         for j in range(0, n-i-1):
             if arr[j] > arr[j+1]:
                 arr[j], arr[j+1] = arr[j+1], arr[j]
+                swapped = True
+        if not swapped:
+            break
     return arr
+
 def quicksort(arr):
     if len(arr) <= 1:
         return arr
@@ -23,7 +34,17 @@ def interpolateAndPlot(listsize, times, popt, pcov, func, title):
     plt.title(title)
     plt.savefig(title + '.png')
     plt.show()
+def plotQuickVersusBubble(listsize, timeitBubbleSortAvg, timeitQuickSortAvg, poptBS, pcovBS, poptQS, pcovQS, func1, func2,title):
+    x = np.linspace(min(listsize), max(listsize), num=100, endpoint=True)
+    plt.plot(listsize, timeitBubbleSortAvg, x, func1(x, *poptBS), '-', label='Bubble Sort')
+    plt.plot(listsize, timeitQuickSortAvg, x, func2(x, *poptQS), '-', label='Quick Sort')
+    plt.legend()
+    plt.xlabel('List Size')
+    plt.ylabel('Time')
 
+    plt.title(title)
+    plt.savefig(title + '.png')
+    plt.show()
 def sortRegardListSize(arr):
     if len(arr) <= 1:
         return arr
@@ -36,18 +57,18 @@ def sortRegardListSize(arr):
     
 
 if __name__ == '__main__':
+    Arrlen = []
     arrofArrays = []
     for i in range(20):
-        arrofArrays.append(np.random.randint(0, 16000, 1))
-    j = 0
-    arrofArrays = np.sort(arrofArrays)
-    for i in arrofArrays:
-        arrofArrays[j] = np.random.choice(np.arange(1,i*2), i, replace=False)
-        j += 1
-
+        Arrlen.append(np.random.randint(0, 1000, 1))
+    Arrlen_np = np.array(Arrlen)
+    sortedArrlen = sorted(Arrlen_np, key=lambda x: x[0])
+    for i in sortedArrlen:
+        arrofArrays.append(list(np.random.choice(np.arange(1,i*2), i, replace=False)))
+    print(sys.getrecursionlimit())
     sortedArrays = []
     for i in arrofArrays:
-        sortedArrays.append(np.sort(i))
+        sortedArrays.append(list(np.sort(i)))
 
     reversedSortedArrays = []
     for i in sortedArrays:
@@ -56,21 +77,52 @@ if __name__ == '__main__':
     timeitBubbleSortAvg = []
     timeitQuickSortAvg = []
     for i in range(20):
-        timeitBubbleSortAvg.append(timeit.timeit(lambda: bubblesort(arrofArrays[i]), number=100)/100)
-        timeitQuickSortAvg.append(timeit.timeit(lambda: quicksort(arrofArrays[i]), number=100)/100)
+        print('List ',i,' : List Size :', len(arrofArrays[i]))
+        arrCopy = copy.deepcopy(arrofArrays[i])
+        timeitBubbleSortAvgtemp = []
+        timeitQuickSortAvgtemp = []
+        for j in range(100):
+            random.shuffle(arrCopy)
+            timeitBubbleSortAvgtemp.append(timeit.timeit(lambda: bubblesort(arrCopy),number=1))
+            random.shuffle(arrCopy)
+            timeitQuickSortAvgtemp.append(timeit.timeit(lambda: quicksort(arrCopy), number=1))
+        timeitBubbleSortAvg.append(sum(timeitBubbleSortAvgtemp))
+        print('Bubble Sort Average Time:', timeitBubbleSortAvg[-1])
+        timeitQuickSortAvg.append(sum(timeitQuickSortAvgtemp))
+        print('Quick Sort Average Time:', timeitQuickSortAvg[-1])
+
     
     timeitBubbleSortBest = []
     timeitQuickSortBestSorted = []
     for i in range(20):
-        timeitBubbleSortBest.append(timeit.timeit(lambda: bubblesort(sortedArrays[i]), number=100)/100)
-        timeitQuickSortBestSorted.append(timeit.timeit(lambda: quicksort(arrofArrays[i]), number=100)/100)
+        timeitBSBTemp = []
+        timeitQSBTemp = []
+        for j in range(100):
+            arrCopy = copy.deepcopy(sortedArrays[i])
+            timeitBSBTemp.append(timeit.timeit(lambda: bubblesort(arrCopy), number=1))
+            arrCopy = copy.deepcopy(arrofArrays[i])
+            random.shuffle(arrCopy)
+            timeitQSBTemp.append(timeit.timeit(lambda: quicksort(arrCopy), number=1))
+        timeitBubbleSortBest.append(sum(timeitBSBTemp))
+        print('Bubble Sort Best Time:', timeitBubbleSortBest[-1])
+        timeitQuickSortBestSorted.append(sum(timeitQSBTemp))
+        print('Quick Sort Best Time:', timeitQuickSortBestSorted[-1])
+
 
     timeitBubbleSortWorst = []
     timeitQuickSortWorst = []
     for i in range(20):
-        timeitBubbleSortWorst.append(timeit.timeit(lambda: bubblesort(reversedSortedArrays[i]), number=100)/100)
-        timeitQuickSortWorst.append(timeit.timeit(lambda: quicksort(reversedSortedArrays[i]), number=100)/100)
-
+        timeitBSWTemp = []
+        timeitQSWTemp = []
+        for j in range(100):
+            arrCopy = copy.deepcopy(reversedSortedArrays[i])
+            timeitBSWTemp.append(timeit.timeit(lambda: bubblesort(arrCopy), number=1))
+            arrCopy = copy.deepcopy(reversedSortedArrays[i])
+            timeitQSWTemp.append(timeit.timeit(lambda: quicksort(arrCopy), number=1))
+        timeitBubbleSortWorst.append(sum(timeitBSWTemp))
+        print('Bubble Sort Worst Time:', timeitBubbleSortWorst[-1])
+        timeitQuickSortWorst.append(sum(timeitQSWTemp))
+        print('Quick Sort Worst Time:', timeitQuickSortWorst[-1])
     listsize = []
     for i in range(20):
         listsize.append(len(arrofArrays[i]))
@@ -82,12 +134,12 @@ if __name__ == '__main__':
     def linear(n ,a, b):
         return a*n + b
     
-    popt_BSA, pcov_BSA = curve_fit(qudratic, listsize, timeitBubbleSortAvg)
-    popt_QSA, pcov_QSA = curve_fit(nlogn, listsize, timeitQuickSortAvg)
-    popt_BSB, pcov_BSB = curve_fit(qudratic, listsize, timeitBubbleSortBest)
-    popt_QSB, pcov_QSB = curve_fit(nlogn, listsize, timeitQuickSortBestSorted)
-    popt_BSW, pcov_BSW = curve_fit(qudratic, listsize, timeitBubbleSortWorst)
-    popt_QSW, pcov_QSW = curve_fit(nlogn, listsize, timeitQuickSortWorst)
+    popt_BSA, pcov_BSA = curve_fit(qudratic, listsize, timeitBubbleSortAvg) #bubble sort average case
+    popt_QSA, pcov_QSA = curve_fit(nlogn, listsize, timeitQuickSortAvg) #quick sort average case
+    popt_BSB, pcov_BSB = curve_fit(linear, listsize, timeitBubbleSortBest) #bubble sort best case
+    popt_QSB, pcov_QSB = curve_fit(nlogn, listsize, timeitQuickSortBestSorted) #quick sort best case
+    popt_BSW, pcov_BSW = curve_fit(qudratic, listsize, timeitBubbleSortWorst) #bubble sort worst case
+    popt_QSW, pcov_QSW = curve_fit(qudratic, listsize, timeitQuickSortWorst) #quick sort worst case
 
     print('Bubble Sort Average Case')
     for i in range(20):
@@ -109,10 +161,14 @@ if __name__ == '__main__':
         print('List ',i,' : List Size :', listsize[i], 'Time:', timeitQuickSortWorst[i])
     interpolateAndPlot(listsize, timeitBubbleSortAvg, popt_BSA, pcov_BSA, qudratic, 'Bubble Sort Average Case')
     interpolateAndPlot(listsize, timeitQuickSortAvg, popt_QSA, pcov_QSA, nlogn, 'Quick Sort Average Case')
-    interpolateAndPlot(listsize, timeitBubbleSortBest, popt_BSB, pcov_BSB, qudratic, 'Bubble Sort Best Case')
+    interpolateAndPlot(listsize, timeitBubbleSortBest, popt_BSB, pcov_BSB, linear, 'Bubble Sort Best Case')
     interpolateAndPlot(listsize, timeitQuickSortBestSorted, popt_QSB, pcov_QSB, nlogn, 'Quick Sort Best Case')
     interpolateAndPlot(listsize, timeitBubbleSortWorst, popt_BSW, pcov_BSW, qudratic, 'Bubble Sort Worst Case')
-    interpolateAndPlot(listsize, timeitQuickSortWorst, popt_QSW, pcov_QSW, nlogn, 'Quick Sort Worst Case')
+    interpolateAndPlot(listsize, timeitQuickSortWorst, popt_QSW, pcov_QSW, qudratic, 'Quick Sort Worst Case')
+
+    plotQuickVersusBubble(listsize, timeitBubbleSortAvg, timeitQuickSortAvg, popt_BSA, pcov_BSA, popt_QSA, pcov_QSA, qudratic, nlogn, 'Versus Average Case')
+    plotQuickVersusBubble(listsize, timeitBubbleSortBest, timeitQuickSortBestSorted, popt_BSB, pcov_BSB, popt_QSB, pcov_QSB, linear, nlogn, 'Versus Best Case')
+    plotQuickVersusBubble(listsize, timeitBubbleSortWorst, timeitQuickSortWorst, popt_BSW, pcov_BSW, popt_QSW, pcov_QSW, qudratic, qudratic, 'Versus Worst Case')
 
 
 
