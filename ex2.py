@@ -32,7 +32,7 @@ def interpolateAndPlot(listsize, times, popt, pcov, func, title):
     x = np.linspace(min(listsize), max(listsize), num=100, endpoint=True)
     plt.plot(listsize, times, x, func(x, *popt), '-')
     plt.title(title)
-    plt.savefig(title + '.png')
+    plt.savefig('./img/'+title + '.png')
     plt.show()
 def plotQuickVersusBubble(listsize, timeitBubbleSortAvg, timeitQuickSortAvg, poptBS, pcovBS, poptQS, pcovQS, func1, func2,title):
     x = np.linspace(min(listsize), max(listsize), num=100, endpoint=True)
@@ -43,7 +43,7 @@ def plotQuickVersusBubble(listsize, timeitBubbleSortAvg, timeitQuickSortAvg, pop
     plt.ylabel('Time')
 
     plt.title(title)
-    plt.savefig(title + '.png')
+    plt.savefig('./img/'+title + '.png')
     plt.show()
 def sortRegardListSize(arr):
     if len(arr) <= 1:
@@ -86,9 +86,9 @@ if __name__ == '__main__':
             timeitBubbleSortAvgtemp.append(timeit.timeit(lambda: bubblesort(arrCopy),number=1))
             random.shuffle(arrCopy)
             timeitQuickSortAvgtemp.append(timeit.timeit(lambda: quicksort(arrCopy), number=1))
-        timeitBubbleSortAvg.append(sum(timeitBubbleSortAvgtemp))
+        timeitBubbleSortAvg.append((sum(timeitBubbleSortAvgtemp))/100)
         print('Bubble Sort Average Time:', timeitBubbleSortAvg[-1])
-        timeitQuickSortAvg.append(sum(timeitQuickSortAvgtemp))
+        timeitQuickSortAvg.append((sum(timeitQuickSortAvgtemp))/100)
         print('Quick Sort Average Time:', timeitQuickSortAvg[-1])
 
     
@@ -103,10 +103,10 @@ if __name__ == '__main__':
             arrCopy = copy.deepcopy(arrofArrays[i])
             random.shuffle(arrCopy)
             timeitQSBTemp.append(timeit.timeit(lambda: quicksort(arrCopy), number=1))
-        timeitBubbleSortBest.append(sum(timeitBSBTemp))
+        timeitBubbleSortBest.append((sum(timeitBSBTemp))/100)
         print('Bubble Sort Best Time:', timeitBubbleSortBest[-1])
-        timeitQuickSortBestSorted.append(sum(timeitQSBTemp))
-        print('Quick Sort Best Time:', timeitQuickSortBestSorted[-1])
+        timeitQuickSortBestSorted.append((sum(timeitQSBTemp))/100)
+        print('Quick Sort Best Time:', timeitQuickSortBestSorted[-1]/100)
 
 
     timeitBubbleSortWorst = []
@@ -119,9 +119,9 @@ if __name__ == '__main__':
             timeitBSWTemp.append(timeit.timeit(lambda: bubblesort(arrCopy), number=1))
             arrCopy = copy.deepcopy(reversedSortedArrays[i])
             timeitQSWTemp.append(timeit.timeit(lambda: quicksort(arrCopy), number=1))
-        timeitBubbleSortWorst.append(sum(timeitBSWTemp))
+        timeitBubbleSortWorst.append((sum(timeitBSWTemp))/100)
         print('Bubble Sort Worst Time:', timeitBubbleSortWorst[-1])
-        timeitQuickSortWorst.append(sum(timeitQSWTemp))
+        timeitQuickSortWorst.append((sum(timeitQSWTemp))/100)
         print('Quick Sort Worst Time:', timeitQuickSortWorst[-1])
     listsize = []
     for i in range(20):
